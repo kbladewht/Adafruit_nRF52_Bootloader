@@ -139,6 +139,7 @@ static void wait_for_events(void)
         (m_update_status == BOOTLOADER_RESET) )
     {
       // When update has completed or a timeout/reset occured we will return.
+       NVIC_SystemReset();
       return;
     }
   }

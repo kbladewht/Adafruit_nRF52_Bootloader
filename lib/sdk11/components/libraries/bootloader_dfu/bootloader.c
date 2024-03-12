@@ -339,13 +339,13 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
     // DFU mode with timeout can be
     // - Forced startup DFU for nRF52832 or
     // - Makecode single tap reset but no enumerated (battery power)
-    if ( timeout_ms )
-    {
+    // if ( timeout_ms )
+    // {
       dfu_startup_packet_received = false;
 
       app_timer_create(&_dfu_startup_timer, APP_TIMER_MODE_SINGLE_SHOT, dfu_startup_timer_handler);
-      app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(timeout_ms), NULL);
-    }
+      app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(30000), NULL);
+    // }
 
     err_code = dfu_transport_serial_update_start();
   }

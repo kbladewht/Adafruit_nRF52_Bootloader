@@ -92,6 +92,7 @@ static void dfu_startup_timer_handler(void * p_context)
   // dfu_startup_packet_received is set by process_dfu_packet() in dfu_transport_serial.c
   if (!dfu_startup_packet_received)
   {
+     NVIC_SystemReset();
     dfu_update_status_t update_status;
     update_status.status_code = DFU_TIMEOUT;
 

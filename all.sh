@@ -15,9 +15,22 @@ rm -rf _build/*
 
 mkdir -p _build
   printf "${GREEN}generating receiver...$END\n"
+
+if [ "$1" = "820" ]; then
+  make BOARD=feather_nrf52820_express all
+  
+  printf "${GREEN}Done generate receiver...$END\n"
+  exit 0  
+fi
+
+if [ "$1" = "833" ]; then
+  make BOARD=feather_nrf52833_express all
+  printf "${GREEN}Done generate receiver...$END\n"
+  exit 0    
+fi
   
  # make CROSS_COMPILE=C:/msys64/mingw64/bin/arm-none-eabi- BOARD=feather_nrf52833_express all
-  make  BOARD=feather_nrf52820_express all
+  #make  BOARD=feather_nrf52820_express all
     # make  BOARD=feather_nrf52833_express all
   #python ./uf2conv.py $receiver_hex_path -c -f 0x621e937a -o 833_receiver.uf2
  

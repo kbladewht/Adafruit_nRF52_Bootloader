@@ -17,7 +17,8 @@ mkdir -p _build
   printf "${GREEN}generating receiver...$END\n"
   
  # make CROSS_COMPILE=C:/msys64/mingw64/bin/arm-none-eabi- BOARD=feather_nrf52833_express all
-  make  BOARD=feather_nrf52833_express all
+  make  BOARD=feather_nrf52820_express all
+    # make  BOARD=feather_nrf52833_express all
   #python ./uf2conv.py $receiver_hex_path -c -f 0x621e937a -o 833_receiver.uf2
  
  

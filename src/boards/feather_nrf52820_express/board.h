@@ -25,6 +25,7 @@
 #ifndef _FEATHER_NRF52833_H
 #define _FEATHER_NRF52833_H
 
+
 #define _PINNUM(port, pin)    ((port)*32 + (pin))
 
 /*------------------------------------------------------------------*/
@@ -52,6 +53,7 @@
 //--------------------------------------------------------------------+
 #define BLEDIS_MANUFACTURER   "Adafruit Industries"
 #define BLEDIS_MODEL          "Feather nRF52820 PILOT"
+#define MCU_QF nrf52820
 
 //--------------------------------------------------------------------+
 // USB

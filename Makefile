@@ -33,6 +33,9 @@ else
   LD_FILE = linker/$(MCU_SUB_VARIANT).ld
 endif
 
+
+	LD_FILE = linker/nrf52820.ld
+
 GIT_VERSION := $(shell git describe --dirty --always --tags)
 GIT_SUBMODULE_VERSIONS := $(shell git submodule status | cut -d" " -f3,4 | paste -s -d" " -)
 
@@ -452,7 +455,7 @@ $(BUILD)/$(MERGED_FILE).hex: $(BUILD)/$(OUT_NAME).hex
 
 # Create pkg zip file for bootloader+SD combo to use with DFU CDC
 $(BUILD)/$(MERGED_FILE).zip: $(BUILD)/$(OUT_NAME).hex
-	@$(NRFUTIL) dfu genpkg --dev-type 0x0052 --dev-revision $(DFU_DEV_REV) --bootloader $< --softdevice $(SD_HEX) $@
+	#@$(NRFUTIL) dfu genpkg --dev-type 0x0052 --dev-revision $(DFU_DEV_REV) --bootloader $< --softdevice $(SD_HEX) $@
 
 #-------------- Artifacts --------------
 $(BIN):
@@ -498,9 +501,9 @@ flash-mbr:
 
 # dfu with adafruit-nrfutil using CDC interface
 dfu-flash: flash-dfu
-flash-dfu: $(BUILD)/$(MERGED_FILE).zip
-	@:$(call check_defined, SERIAL, example: SERIAL=/dev/ttyACM0)
-	$(NRFUTIL) --verbose dfu serial --package $< -p $(SERIAL) -b 115200 --singlebank --touch 1200
+# flash-dfu: $(BUILD)/$(MERGED_FILE).zip
+# 	@:$(call check_defined, SERIAL, example: SERIAL=/dev/ttyACM0)
+# 	$(NRFUTIL) --verbose dfu serial --package $< -p $(SERIAL) -b 115200 --singlebank --touch 1200
 	
 # flash skip crc magic ( app valid = 0x0001, crc = 0x0000 )
 #flash-skip-crc:

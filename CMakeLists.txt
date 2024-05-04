@@ -44,7 +44,9 @@ add_executable(bootloader)
 if(NOT DEFINED SD_VERSION)
   set(SD_VERSION 6.1.1)
 endif ()
-
+if(NOT DEFINED MCU_QF)
+  set(MCU_QF 6.1.1)
+endif ()
 set(MBR_HEX ${SOFTDEVICE}/mbr/hex/mbr_nrf52_2.4.1_mbr.hex)
 
 target_sources(bootloader PUBLIC
@@ -237,7 +239,19 @@ elseif (MCU_VARIANT STREQUAL "nrf52833")
   target_include_directories(bootloader PUBLIC
     ${SOFTDEVICE}/s140_nrf52_6.1.1/s140_nrf52_6.1.1_API/include
     )
-
+elseif (MCU_QF STREQUAL "nrf52833")
+    set(SD_NAME s140)
+    set(MCU_QF nrf52833)
+    set(DFU_DEV_REV 52833)
+    set(DFU_APP_DATA_RESERVED 7*4096)
+    target_compile_definitions(bootloader PUBLIC
+      NRF52833_XXAA
+      S140
+      )
+    target_include_directories(bootloader PUBLIC
+      ${SOFTDEVICE}/s140_nrf52_6.1.1/s140_nrf52_6.1.1_API/include
+      )
+  
 elseif (MCU_VARIANT STREQUAL "nrf52840")
   set(SD_NAME s140)
   set(DFU_DEV_REV 52840)

@@ -92,7 +92,6 @@ static void dfu_startup_timer_handler(void * p_context)
   // dfu_startup_packet_received is set by process_dfu_packet() in dfu_transport_serial.c
   if (!dfu_startup_packet_received)
   {
-     NVIC_SystemReset();
     dfu_update_status_t update_status;
     update_status.status_code = DFU_TIMEOUT;
 
@@ -140,7 +139,6 @@ static void wait_for_events(void)
         (m_update_status == BOOTLOADER_RESET) )
     {
       // When update has completed or a timeout/reset occured we will return.
-       NVIC_SystemReset();
       return;
     }
   }
@@ -340,13 +338,13 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
     // DFU mode with timeout can be
     // - Forced startup DFU for nRF52832 or
     // - Makecode single tap reset but no enumerated (battery power)
-    // if ( timeout_ms )
-    // {
+    if ( timeout_ms )
+    {
       dfu_startup_packet_received = false;
 
       app_timer_create(&_dfu_startup_timer, APP_TIMER_MODE_SINGLE_SHOT, dfu_startup_timer_handler);
-      app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(60000), NULL);
-    // }
+      app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(timeout_ms), NULL);
+    }
 
     err_code = dfu_transport_serial_update_start();
   }

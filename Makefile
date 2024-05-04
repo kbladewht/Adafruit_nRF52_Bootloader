@@ -115,9 +115,9 @@ ifeq ($(MCU_SUB_VARIANT),nrf52)
   CFLAGS += -DNRF52 -DNRF52832_XXAA -DS132
   DFU_APP_DATA_RESERVED=7*4096
 else ifeq ($(MCU_SUB_VARIANT),nrf52833)
-  SD_NAME = s112
+  SD_NAME = s140
   DFU_DEV_REV = 52833
-  CFLAGS += -DNRF52833_XXAA -DS112
+  CFLAGS += -DNRF52833_XXAA -DS140
   DFU_APP_DATA_RESERVED=7*4096
 else ifeq ($(MCU_SUB_VARIANT),nrf52840)
   SD_NAME = s140
@@ -148,7 +148,7 @@ C_SRC += src/boards/boards.c
 # nrfx
 C_SRC += $(NRFX_PATH)/drivers/src/nrfx_power.c
 C_SRC += $(NRFX_PATH)/drivers/src/nrfx_nvmc.c
-C_SRC += $(NRFX_PATH)/mdk/system_nrf52820.c
+C_SRC += $(NRFX_PATH)/mdk/system_$(MCU_SUB_VARIANT).c
 
 # SDK 11 files: serial + OTA DFU
 C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/bootloader.c
@@ -335,7 +335,7 @@ ifeq ($(DEBUG), 1)
   ifeq ($(MCU_SUB_VARIANT),nrf52840)
     CFLAGS += -DBOOTLOADER_REGION_START=0xEA000
   else
-    CFLAGS += -DBOOTLOADER_REGION_START=0x3A000
+    CFLAGS += -DBOOTLOADER_REGION_START=0x6D000
   endif
 endif
 

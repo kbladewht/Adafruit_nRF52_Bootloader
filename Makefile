@@ -34,7 +34,6 @@ else
 endif
 
 
-	LD_FILE = linker/nrf52820.ld
 
 GIT_VERSION := $(shell git describe --dirty --always --tags)
 GIT_SUBMODULE_VERSIONS := $(shell git submodule status | cut -d" " -f3,4 | paste -s -d" " -)

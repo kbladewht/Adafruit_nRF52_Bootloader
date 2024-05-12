@@ -178,7 +178,7 @@ int main(void) {
   // When updating SoftDevice, bootloader will reset before swapping SD
   if (bootloader_dfu_sd_in_progress()) {
     led_state(STATE_WRITING_STARTED);
-
+ PRINTF("bootloader_dfu_sd_in_progress Start\r\n");
     bootloader_dfu_sd_update_continue();
     bootloader_dfu_sd_update_finalize();
 
@@ -187,9 +187,12 @@ int main(void) {
 
   // Check all inputs and enter DFU if needed
   // Return when DFU process is complete (or not entered at all)
+  
+ PRINTF("check_dfu_mode \r\n");
   check_dfu_mode();
 
   // Reset peripherals
+   PRINTF("board_teardown \r\n");
   board_teardown();
 
   /* Jump to application if valid
@@ -213,6 +216,7 @@ int main(void) {
     (*dbl_reset_mem) = 0;
 
     // start application
+     PRINTF("bootloader_app_start \r\n");
     bootloader_app_start();
   }
 
@@ -299,10 +303,10 @@ static void check_dfu_mode(void) {
     // Initiate an update of the firmware.
     if (APP_ASKS_FOR_SINGLE_TAP_RESET() || uf2_dfu || serial_only_dfu) {
       // If USB is not enumerated in 3s (eg. because we're running on battery), we restart into app.
-      bootloader_dfu_start(_ota_dfu, 10*3000, false);
+      bootloader_dfu_start(_ota_dfu, 3000, true);
     } else {
       // No timeout if bootloader requires user action (double-reset).
-      bootloader_dfu_start(_ota_dfu, 10*3000, false);
+      bootloader_dfu_start(_ota_dfu, 0, false);
     }
 
     if (_ota_dfu) {
@@ -468,13 +472,8 @@ void SD_EVT_IRQHandler(void) {
 //--------------------------------------------------------------------+
 // RTT printf retarget for Debug
 //--------------------------------------------------------------------+
-#ifdef CFG_DEBUG
 #include "SEGGER_RTT.h"
 
-__attribute__ ((used)) int _write (int fhdl, const void *buf, size_t count) {
-  (void) fhdl;
-  SEGGER_RTT_Write(0, (char*) buf, (int) count);
-  return count;
+void print_qf(const char* message) {
+  SEGGER_RTT_Write(0, message, strlen(message));
 }
-
-#endif

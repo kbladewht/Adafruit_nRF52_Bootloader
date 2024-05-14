@@ -87,6 +87,8 @@
   #define ADAFRUIT_DEV_REV           52840
 #elif defined(NRF52833_XXAA)
   #define ADAFRUIT_DEV_REV           52833
+#elif defined(NRF52820_XXAA)
+  #define ADAFRUIT_DEV_REV           52820
 #elif defined NRF52832_XXAA
   #define ADAFRUIT_DEV_REV           0xADAF
 #else

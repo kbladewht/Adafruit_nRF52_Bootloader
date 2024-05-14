@@ -54,6 +54,8 @@ void USBD_IRQHandler(void) {
 
 //------------- IMPLEMENTATION -------------//
 void usb_init(bool cdc_only) {
+
+  PRINTF("usb_init pppppppppppppppppp\n");
   // 0, 1 is reserved for SD
   NVIC_SetPriority(USBD_IRQn, 2);
 
@@ -62,17 +64,25 @@ void usb_init(bool cdc_only) {
   uint32_t usb_reg;
   uint8_t sd_en = false;
 
+  PRINTF("usb_init xxxxxxxxxxx\n");
+  
   if (is_sd_existed()) {
+
+    PRINTF("usb_init is_sd_existed start..... \n");
     sd_softdevice_is_enabled(&sd_en);
+    PRINTF("usb_init is_sd_existed END *************** \n");
   }
 
   if (sd_en) {
+     PRINTF("usb_init 2222\n");
     sd_power_usbdetected_enable(true);
     sd_power_usbpwrrdy_enable(true);
     sd_power_usbremoved_enable(true);
     sd_power_usbregstatus_get(&usb_reg);
   } else {
     // Power module init
+    
+     PRINTF("usb_init 3333\n");
     const nrfx_power_config_t pwr_cfg = {0};
     nrfx_power_init(&pwr_cfg);
 
@@ -85,22 +95,29 @@ void usb_init(bool cdc_only) {
     usb_reg = NRF_POWER->USBREGSTATUS;
   }
 
+     PRINTF("usb_init 4444\n");
   if (usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk) {
     tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_DETECTED);
   }
 
   if (usb_reg & POWER_USBREGSTATUS_OUTPUTRDY_Msk) {
+    
+     PRINTF("usb_init 5555\n");
     tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_READY);
   }
-
+ PRINTF("usb_init 6666\n");
   usb_desc_init(cdc_only);
+ PRINTF("usb_init 7777\n");
   uf2_init();
+ PRINTF("usb_init 8888\n");
   tusb_init();
 
+ PRINTF("usb_init 9999\n");
   #ifdef DISPLAY_PIN_SCK
   board_display_init();
   screen_draw_drag();
   #endif
+ PRINTF("usb_init 10101010\n");
 }
 
 void usb_teardown(void) {

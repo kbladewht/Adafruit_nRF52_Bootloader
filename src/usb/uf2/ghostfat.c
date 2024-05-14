@@ -246,9 +246,10 @@ static inline bool in_uicr_space(uint32_t addr)
 void uf2_init(void)
 {
   strcat(infoUf2File, "SoftDevice: ");
-
+ PRINTF("uf2_init  bnbbb \r\n");
   if ( is_sd_existed() )
   {
+    PRINTF("sdfsdfsd \r\n");
     uint32_t const sd_id      = SD_ID_GET(MBR_SIZE);
     uint32_t const sd_version = SD_VERSION_GET(MBR_SIZE);
 
@@ -276,7 +277,7 @@ void uf2_init(void)
     strcat(infoUf2File, str);
     strcat(infoUf2File, "\r\n");
   }else
-  {
+  { PRINTF("not found*************** \r\n");
     strcat(infoUf2File, "not found\r\n");
   }
 }

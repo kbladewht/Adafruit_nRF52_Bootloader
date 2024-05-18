@@ -26,6 +26,7 @@
 #include "nrf_sdm.h"
 #include "flash_nrf5x.h"
 #include "boards.h"
+#include "aes.h"
 
 #define FLASH_PAGE_SIZE           4096
 #define FLASH_CACHE_INVALID_ADDR  0xffffffff
@@ -58,8 +59,22 @@ void flash_nrf5x_flush (bool need_erase)
   _fl_addr = FLASH_CACHE_INVALID_ADDR;
 }
 
-void flash_nrf5x_write (uint32_t dst, void const *src, int len, bool need_erase)
+void flash_nrf5x_write (uint32_t dst, void *src, int len, bool need_erase)
 {
+#ifdef ENCRYPT_ENABLE
+    extern unsigned char key[];
+    static uint8_t buffer_decrypt[16];
+    memset(buffer_decrypt, 0, sizeof(buffer_decrypt));
+    if (len % 16 != 0) {
+    } else {
+        uint32_t count = (len / 16);
+        for (uint32_t i = 0; i < count; ++i) {
+            AES128_ECB_decrypt(src + (i * 16), key, buffer_decrypt);
+            memcpy(src + (i * 16), buffer_decrypt, sizeof(buffer_decrypt));
+        }
+    }
+#endif
+
   uint32_t newAddr = dst & ~(FLASH_PAGE_SIZE - 1);
 
   if ( newAddr != _fl_addr )

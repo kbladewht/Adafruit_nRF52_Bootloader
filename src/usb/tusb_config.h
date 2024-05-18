@@ -52,8 +52,13 @@
 #define CFG_TUD_ENDOINT0_SIZE       64
 
 //------------- Class enabled -------------//
+#ifdef VIBL_ENABLE
+#define CFG_TUD_HID                 1
+#define CFG_TUD_CDC                 1
+#else
 #define CFG_TUD_CDC                 1
 #define CFG_TUD_MSC                 1
+#endif
 
 /*------------------------------------------------------------------*/
 /* CLASS DRIVER

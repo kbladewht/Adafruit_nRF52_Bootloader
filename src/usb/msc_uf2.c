@@ -154,6 +154,8 @@ int32_t tud_msc_write10_cb (uint8_t lun, uint32_t lba, uint32_t offset, uint8_t*
     count  += 512;
   }
 
+  extern void restart_timeout_exit_timer(void);
+  restart_timeout_exit_timer();
   return count;
 }
 

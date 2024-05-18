@@ -22,7 +22,7 @@
 #include "app_util.h"
 #include "app_error.h"
 
-#include "ble_l2cap.h"
+// #include "ble_l2cap.h"
 #include "ble_gap.h"
 #include "ble_gatt.h"
 #include "ble_hci.h"
@@ -883,11 +883,11 @@ static void on_ble_evt(ble_evt_t * p_ble_evt)
             // No implementation needed.
             break;
 
-        case BLE_GAP_EVT_DATA_LENGTH_UPDATE_REQUEST:
-          // Let Softdevice decide the data length
-          // ble_gap_data_length_params_t* param = &evt->evt.gap_evt.params.data_length_update_request.peer_params
-          APP_ERROR_CHECK( sd_ble_gap_data_length_update(m_conn_handle, NULL, NULL) );
-        break;
+        // case BLE_GAP_EVT_DATA_LENGTH_UPDATE_REQUEST:
+        //   // Let Softdevice decide the data length
+        //   // ble_gap_data_length_params_t* param = &evt->evt.gap_evt.params.data_length_update_request.peer_params
+        //   APP_ERROR_CHECK( sd_ble_gap_data_length_update(m_conn_handle, NULL, NULL) );
+        // break;
 
         case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
         {

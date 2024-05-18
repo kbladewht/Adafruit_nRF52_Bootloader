@@ -117,10 +117,10 @@ static void wait_for_events(void)
 
     // Feed all Watchdog just in case application enable it
     // WDT cannot be disabled once started. It even last through NVIC soft reset
-    if ( nrf_wdt_started(NRF_WDT) )
-    {
-      for (uint8_t i=0; i<8; i++) nrf_wdt_reload_request_set(NRF_WDT, i);
-    }
+    // if ( nrf_wdt_started(NRF_WDT) )
+    // {
+    //   for (uint8_t i=0; i<8; i++) nrf_wdt_reload_request_set(NRF_WDT, i);
+    // }
 
     // Event received. Process it from the scheduler.
     app_sched_execute();
@@ -323,7 +323,7 @@ uint32_t bootloader_init(void)
 uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout_on_usb)
 {
   uint32_t err_code;
-
+  PRINTF("bootloader_dfu_start 111 \r\n");
   m_cancel_timeout_on_usb = cancel_timeout_on_usb && !ota;
 
   // Clear swap if banked update is used.
@@ -332,16 +332,18 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
 
   if ( ota )
   {
+  PRINTF("bootloader_dfu_start 2222 \r\n");
     err_code = dfu_transport_ble_update_start();
   }else
   {
+  PRINTF("bootloader_dfu_start 3333 \r\n");
     // DFU mode with timeout can be
     // - Forced startup DFU for nRF52832 or
     // - Makecode single tap reset but no enumerated (battery power)
     if ( timeout_ms )
     {
       dfu_startup_packet_received = false;
-
+ PRINTF("bootloader_dfu_start 4444 \r\n");
       app_timer_create(&_dfu_startup_timer, APP_TIMER_MODE_SINGLE_SHOT, dfu_startup_timer_handler);
       app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(timeout_ms), NULL);
     }
@@ -349,8 +351,10 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
     err_code = dfu_transport_serial_update_start();
   }
 
+ PRINTF("bootloader_dfu_start 55555 \r\n");
   wait_for_events();
 
+ PRINTF("bootloader_dfu_start 66666 \r\n");
   return err_code;
 }
 
@@ -396,8 +400,9 @@ void bootloader_app_start(void)
     // MBR use first 4-bytes of SRAM to store foward address
     *(uint32_t *)(0x20000000) = app_addr;
   }
-
+#include <inttypes.h>
   // jump to app
+  PRINTF("jump to app. 1111 \r\n 0x%" PRIx32 " \r\n", app_addr);
   bootloader_util_app_start(app_addr);
 }
 

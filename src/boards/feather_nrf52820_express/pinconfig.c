@@ -8,10 +8,10 @@ const uint32_t bootloaderConfig[] =
   CFG_MAGIC0, CFG_MAGIC1,                       // magic
   5, 100,                                       // used entries, total entries
 
-  204, 0x40000,                                 // FLASH_BYTES for nRF52820 256K
-  205, 0x8000,                                  // RAM_BYTES for nRF52820 32K
+  204, 0x100000,                                // FLASH_BYTES = 0x100000
+  205, 0x40000,                                 // RAM_BYTES = 0x40000
   208, (USB_DESC_VID << 16) | USB_DESC_UF2_PID, // BOOTLOADER_BOARD_ID = USB VID+PID, used for verification when updating bootloader via uf2
-  209, 0x621e937a,                              // UF2_FAMILY
+  209, 0x621e937a,                              // UF2_FAMILY = 0x621e937a
   210, 0x20,                                    // PINS_PORT_SIZE = PA_32
 
   0, 0, 0, 0, 0, 0, 0, 0

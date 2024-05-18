@@ -30,9 +30,9 @@
 #include <string.h>
 #include "nrf.h"
 #include "nrf_gpio.h"
-
+  #include <stdio.h>
 #include "board.h"
-
+  #include "SEGGER_RTT.h"
 #ifndef UF2_VOLUME_LABEL
 #define UF2_VOLUME_LABEL   "NRF52BOOT  "
 #endif
@@ -105,9 +105,9 @@ void led_tick(void);
 // BUTTONS
 //--------------------------------------------------------------------+
 // Make sure we have at least two buttons (DFU + FRESET since DFU+FRST=OTA)
-// #if BUTTONS_NUMBER < 2
-// #error "At least two buttons required in the BSP (see 'BUTTONS_NUMBER')"
-// #endif
+#if BUTTONS_NUMBER < 2
+#error "At least two buttons required in the BSP (see 'BUTTONS_NUMBER')"
+#endif
 
 void button_init(uint32_t pin);
 bool button_pressed(uint32_t pin);
@@ -115,22 +115,8 @@ bool button_pressed(uint32_t pin);
 bool is_ota(void);
 
 //--------------------------------------------------------------------+
-// Display
-//--------------------------------------------------------------------+
-#ifdef DISPLAY_PIN_SCK
-void board_display_init(void);
-void board_display_teardown(void);
-void board_display_draw_line(uint16_t y, uint8_t const* buf, size_t nbytes);
-void screen_draw_drag(void);
-#endif
-
-//--------------------------------------------------------------------+
 // DEBUG
 //--------------------------------------------------------------------+
-
-
-  #include <stdio.h>
-  #include "SEGGER_RTT.h"
   #define PRINTF(...) do { \
       char buffer[256]; \
       snprintf(buffer, sizeof(buffer), __VA_ARGS__); \

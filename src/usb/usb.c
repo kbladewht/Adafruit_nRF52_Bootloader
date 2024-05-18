@@ -33,6 +33,9 @@
 
 #include "uf2/uf2.h"
 #include "boards.h"
+#include "app_timer.h"
+#include "dfu_types.h"
+#include "bootloader.h"
 
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
@@ -43,51 +46,59 @@
 extern void tusb_hal_nrf_power_event(uint32_t event);
 
 // power callback when SD is not enabled
-static void power_event_handler(nrfx_power_usb_evt_t event) {
+static void power_event_handler(nrfx_power_usb_evt_t event)
+{
   tusb_hal_nrf_power_event((uint32_t) event);
 }
 
 // Forward USB interrupt events to TinyUSB IRQ Handler
-void USBD_IRQHandler(void) {
+void USBD_IRQHandler(void)
+{
   tud_int_handler(0);
 }
 
-//------------- IMPLEMENTATION -------------//
-void usb_init(bool cdc_only) {
+APP_TIMER_DEF(timeout_exit_timer);
 
-  PRINTF("usb_init pppppppppppppppppp\n");
+static void timeout_exit_timer_handler(void* p_context)
+{
+    dfu_update_status_t update_status;
+    update_status.status_code = DFU_TIMEOUT;
+
+    bootloader_dfu_update_process(update_status);
+}
+
+//------------- IMPLEMENTATION -------------//
+void usb_init(bool cdc_only)
+{
   // 0, 1 is reserved for SD
   NVIC_SetPriority(USBD_IRQn, 2);
 
   // USB power may already be ready at this time -> no event generated
   // We need to invoke the handler based on the status initially
   uint32_t usb_reg;
+
   uint8_t sd_en = false;
 
-  PRINTF("usb_init xxxxxxxxxxx\n");
-  
-  if (is_sd_existed()) {
-
-    PRINTF("usb_init is_sd_existed start..... \n");
+  if ( is_sd_existed() )
+  {
     sd_softdevice_is_enabled(&sd_en);
-    PRINTF("usb_init is_sd_existed END *************** \n");
   }
 
-  if (sd_en) {
-     PRINTF("usb_init 2222\n");
+  if ( sd_en )
+  {
     sd_power_usbdetected_enable(true);
     sd_power_usbpwrrdy_enable(true);
     sd_power_usbremoved_enable(true);
+
     sd_power_usbregstatus_get(&usb_reg);
-  } else {
+  }else
+  {
     // Power module init
-    
-     PRINTF("usb_init 3333\n");
-    const nrfx_power_config_t pwr_cfg = {0};
+    const nrfx_power_config_t pwr_cfg = { 0 };
     nrfx_power_init(&pwr_cfg);
 
     // Register USB power handler
-    const nrfx_power_usbevt_config_t config = {.handler = power_event_handler};
+    const nrfx_power_usbevt_config_t config = { .handler = power_event_handler };
     nrfx_power_usbevt_init(&config);
 
     nrfx_power_usbevt_enable();
@@ -95,32 +106,27 @@ void usb_init(bool cdc_only) {
     usb_reg = NRF_POWER->USBREGSTATUS;
   }
 
-     PRINTF("usb_init 4444\n");
-  if (usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk) {
+  if ( usb_reg & POWER_USBREGSTATUS_VBUSDETECT_Msk ) {
     tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_DETECTED);
   }
 
-  if (usb_reg & POWER_USBREGSTATUS_OUTPUTRDY_Msk) {
-    
-     PRINTF("usb_init 5555\n");
+  if ( usb_reg & POWER_USBREGSTATUS_OUTPUTRDY_Msk ) {
     tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_READY);
   }
- PRINTF("usb_init 6666\n");
+
   usb_desc_init(cdc_only);
- PRINTF("usb_init 7777\n");
+
   uf2_init();
- PRINTF("usb_init 8888\n");
+
+  // Init TinyUSB stack
   tusb_init();
 
- PRINTF("usb_init 9999\n");
-  #ifdef DISPLAY_PIN_SCK
-  board_display_init();
-  screen_draw_drag();
-  #endif
- PRINTF("usb_init 10101010\n");
+  app_timer_create(&timeout_exit_timer, APP_TIMER_MODE_SINGLE_SHOT, timeout_exit_timer_handler);
+  app_timer_start(timeout_exit_timer, APP_TIMER_TICKS(60000), NULL);
 }
 
-void usb_teardown(void) {
+void usb_teardown(void)
+{
   // Simulate an disconnect which cause pullup disable, USB perpheral disable and hclk disable
   tusb_hal_nrf_power_event(NRFX_POWER_USB_EVT_REMOVED);
 }
@@ -128,10 +134,18 @@ void usb_teardown(void) {
 //--------------------------------------------------------------------+
 // tinyusb callbacks
 //--------------------------------------------------------------------+
-void tud_mount_cb(void) {
+void tud_mount_cb(void)
+{
   led_state(STATE_USB_MOUNTED);
 }
 
-void tud_umount_cb(void) {
+void tud_umount_cb(void)
+{
   led_state(STATE_USB_UNMOUNTED);
+}
+
+void restart_timeout_exit_timer(void)
+{
+    app_timer_stop(timeout_exit_timer);
+    app_timer_start(timeout_exit_timer, APP_TIMER_TICKS(60000), NULL);
 }

@@ -119,10 +119,6 @@
 #define CRC16_ENABLED                      1
 #define NRF_STRERROR_ENABLED               1
 
-#ifndef NRFX_POWER_CONFIG_IRQ_PRIORITY
-#define NRFX_POWER_CONFIG_IRQ_PRIORITY 7
-#endif
-
 
 #endif //SDK_CONFIG_H
 

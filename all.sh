@@ -16,19 +16,31 @@ rm -rf _build/*
 mkdir -p _build
   printf "${GREEN}generating receiver...$END\n"
 
-if [ "$1" = "820" ]; then
-  make BOARD=feather_nrf52820_express all
-  
-  printf "${GREEN}Done generate receiver...$END\n"
-  exit 0  
+
+qf_debug=0
+if [ -n "$2" ]; then
+  qf_debug=$2
 fi
 
 if [ "$1" = "833" ]; then
-  make BOARD=feather_nrf52833_express all
+  make BOARD=feather_nrf52833_express DEBUG=${qf_debug} all flash
   printf "${GREEN}Done generate receiver...$END\n"
   exit 0    
 fi
+
+if [ "$1" = "820" ]; then
+  printf "${GREEN}Done generate feather_nrf52820_express start...$END\n"
+  make BOARD=feather_nrf52820_express DEBUG=1 all flash
+  printf "${GREEN}Done generate feather_nrf52820_express...$END\n"
+  exit 0    
+fi
   
+if [ "$1" = "840" ]; then
+  make BOARD=feather_nrf52840_express DEBUG=${qf_debug} all
+  printf "${GREEN}Done generate receiver...$END\n"
+  exit 0    
+fi
+
  # make CROSS_COMPILE=C:/msys64/mingw64/bin/arm-none-eabi- BOARD=feather_nrf52833_express all
   #make  BOARD=feather_nrf52820_express all
     # make  BOARD=feather_nrf52833_express all

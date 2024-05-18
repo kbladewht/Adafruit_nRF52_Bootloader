@@ -121,6 +121,11 @@ else ifeq ($(MCU_SUB_VARIANT),nrf52833)
   DFU_DEV_REV = 52833
   CFLAGS += -DNRF52833_XXAA -DS140
   DFU_APP_DATA_RESERVED=7*4096
+else ifeq ($(MCU_SUB_VARIANT),nrf52820)
+  SD_NAME = s112
+  DFU_DEV_REV = 52820
+  CFLAGS += -DNRF52820_XXAA -DS112
+  DFU_APP_DATA_RESERVED=7*4096
 else ifeq ($(MCU_SUB_VARIANT),nrf52840)
   SD_NAME = s140
   DFU_DEV_REV = 52840
@@ -326,7 +331,7 @@ _VER = $(subst ., ,$(word 1, $(subst -, ,$(GIT_VERSION))))
 CFLAGS += -DMK_BOOTLOADER_VERSION='($(word 1,$(_VER)) << 16) + ($(word 2,$(_VER)) << 8) + $(word 3,$(_VER))'
 
 # Debug option use RTT for printf
-ifeq ($(DEBUG), 1)
+# ifeq ($(DEBUG), 1)
   CFLAGS += -DCFG_DEBUG -DSEGGER_RTT_MODE_DEFAULT=SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL
   RTT_SRC = lib/SEGGER_RTT
   IPATH += $(RTT_SRC)/RTT
@@ -336,10 +341,12 @@ ifeq ($(DEBUG), 1)
 	# expand bootloader address to 28KB/40KB of reserved app
   ifeq ($(MCU_SUB_VARIANT),nrf52840)
     CFLAGS += -DBOOTLOADER_REGION_START=0xEA000
+  else ifeq ($(MCU_SUB_VARIANT),nrf52820)
+    CFLAGS += -DBOOTLOADER_REGION_START=0x2D000
   else
     CFLAGS += -DBOOTLOADER_REGION_START=0x6D000
   endif
-endif
+# endif
 
 CFLAGS += -DDFU_APP_DATA_RESERVED=$(DFU_APP_DATA_RESERVED)
 

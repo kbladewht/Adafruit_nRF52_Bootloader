@@ -274,13 +274,9 @@ void bootloader_dfu_update_process(dfu_update_status_t update_status)
   {
     // Timeout has occurred. Close the connection with the DFU Controller.
     uint32_t err_code;
-    if ( is_ota() )
-    {
-      err_code = dfu_transport_ble_close();
-    }else
-    {
+
       err_code = dfu_transport_serial_close();
-    }
+    
     APP_ERROR_CHECK(err_code);
 
     m_update_status = BOOTLOADER_TIMEOUT;
@@ -330,13 +326,7 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
   err_code = dfu_init();
   VERIFY_SUCCESS(err_code);
 
-  if ( ota )
-  {
-  PRINTF("bootloader_dfu_start 2222 \r\n");
-    err_code = dfu_transport_ble_update_start();
-  }else
-  {
-  PRINTF("bootloader_dfu_start 3333 \r\n");
+  
     // DFU mode with timeout can be
     // - Forced startup DFU for nRF52832 or
     // - Makecode single tap reset but no enumerated (battery power)
@@ -349,7 +339,7 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
     }
 
     err_code = dfu_transport_serial_update_start();
-  }
+
 
  PRINTF("bootloader_dfu_start 55555 \r\n");
   wait_for_events();

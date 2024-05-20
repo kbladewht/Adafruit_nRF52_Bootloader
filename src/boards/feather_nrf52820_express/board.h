@@ -51,7 +51,7 @@
 // BLE OTA
 //--------------------------------------------------------------------+
 #define BLEDIS_MANUFACTURER   "Adafruit Industries"
-#define BLEDIS_MODEL          "Feather nRF52820 Express"
+#define BLEDIS_MODEL          "PINRF Bootloader"
 
 //--------------------------------------------------------------------+
 // USB
@@ -62,7 +62,7 @@
 
 //------------- UF2 -------------//
 #define UF2_PRODUCT_NAME      "Adafruit Feather nRF52820 Express"
-#define UF2_VOLUME_LABEL      "FTHR820BOOT"
+#define UF2_VOLUME_LABEL      "PINRF_BOOT"
 #define UF2_BOARD_ID          "nRF52820-Feather-revD"
 #define UF2_INDEX_URL         "https://www.adafruit.com/product/4062"
 

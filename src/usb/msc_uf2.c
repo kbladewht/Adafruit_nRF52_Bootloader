@@ -176,7 +176,7 @@ void tud_msc_write10_complete_cb(uint8_t lun)
 
     bootloader_dfu_update_process(update_status);
 
-    led_state(STATE_WRITING_FINISHED);
+    // led_state(STATE_WRITING_FINISHED);
   }
   else if ( _wr_state.numBlocks )
   {
@@ -184,7 +184,7 @@ void tud_msc_write10_complete_cb(uint8_t lun)
     if (first_write)
     {
       first_write = false;
-      led_state(STATE_WRITING_STARTED);
+      // led_state(STATE_WRITING_STARTED);
     }
 
     // All block of uf2 file is complete --> complete DFU process
@@ -230,7 +230,7 @@ void tud_msc_write10_complete_cb(uint8_t lun)
 
       bootloader_dfu_update_process(update_status);
 
-      led_state(STATE_WRITING_FINISHED);
+      // led_state(STATE_WRITING_FINISHED);
     }
   }
 }

@@ -71,7 +71,7 @@
 //==========================================================
 // <e> UART_ENABLED - nrf_drv_uart - UART/UARTE peripheral driver
 //==========================================================
-#define UART_ENABLED                       1
+#define UART_ENABLED                       0
 #define UART_DEFAULT_CONFIG_HWFC           0
 #define UART_DEFAULT_CONFIG_PARITY         0
 #define UART_DEFAULT_CONFIG_BAUDRATE       UART_BAUDRATE_BAUDRATE_Baud115200
@@ -80,14 +80,14 @@
 #define UART_LEGACY_SUPPORT                1
 #define UART_CONFIG_LOG_ENABLED            0
 
-#define UART0_ENABLED                      1
+#define UART0_ENABLED                      0
 #define UART0_CONFIG_USE_EASY_DMA          0
 
 
 //==========================================================
 // <e> APP_UART_ENABLED - app_uart - UART driver
 //==========================================================
-#define APP_UART_ENABLED                   1
+#define APP_UART_ENABLED                   0
 #define APP_UART_DRIVER_INSTANCE           0
 
 //==========================================================

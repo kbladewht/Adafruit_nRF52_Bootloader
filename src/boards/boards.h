@@ -32,7 +32,9 @@
 #include "nrf_gpio.h"
   #include <stdio.h>
 #include "board.h"
+#ifdef CFG_DEBUG
   #include "SEGGER_RTT.h"
+#endif
 #ifndef UF2_VOLUME_LABEL
 #define UF2_VOLUME_LABEL   "NRF52BOOT  "
 #endif
@@ -117,13 +119,16 @@ bool is_ota(void);
 //--------------------------------------------------------------------+
 // DEBUG
 //--------------------------------------------------------------------+
+#ifdef CFG_DEBUG
   #define PRINTF(...) do { \
       char buffer[256]; \
       snprintf(buffer, sizeof(buffer), __VA_ARGS__); \
       SEGGER_RTT_Write(0, buffer, strlen(buffer)); \
   } while(0)
+#else
 
-  // #define PRINTF                printf
+ #define PRINTF                printf
+#endif
   #define PRINT_LOCATION()      printf("%s: %d:\n", __PRETTY_FUNCTION__, __LINE__)
   #define PRINT_MESS(x)         printf("%s: %d: %s \n"   , __FUNCTION__, __LINE__, (char*)(x))
   #define PRINT_STR(x)          printf("%s: %d: " #x " = %s\n"   , __FUNCTION__, __LINE__, (char*)(x) )

@@ -406,3 +406,130 @@ void print_qf(const char* message) {
   SEGGER_RTT_Write(0, message, strlen(message));
 }
 #endif
+
+
+#ifdef CFG_DEBUG
+
+#include "SEGGER_RTT.h"
+
+__attribute__ ((used))
+int _write (int fhdl, const void *buf, size_t count)
+{
+  (void) fhdl;
+  SEGGER_RTT_Write(0, (char*) buf, (int) count);
+  return count;
+}
+
+__attribute__ ((used))
+int _read (int fhdl, char *buf, size_t count)
+{
+  (void) fhdl;
+  return SEGGER_RTT_Read(0, buf, count);
+}
+
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+
+__attribute__((weak)) int _isatty(int fd)
+{
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+        return 1;
+ 
+    errno = EBADF;
+    return 0;
+}
+ 
+__attribute__((weak)) int _close(int fd)
+{
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+        return 0;
+ 
+    errno = EBADF;
+    return -1;
+}
+ 
+__attribute__((weak)) int _lseek(int fd, int ptr, int dir)
+{
+    (void)fd;
+    (void)ptr;
+    (void)dir;
+ 
+    errno = EBADF;
+    return -1;
+}
+ 
+__attribute__((weak)) int _fstat(int fd, struct stat *st)
+{
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+    {
+        st->st_mode = S_IFCHR;
+        return 0;
+    }
+ 
+    errno = EBADF;
+    return 0;
+}
+
+
+#else
+
+__attribute__ ((used))
+int _write (int fhdl, const void *buf, size_t count)
+{
+  (void) fhdl;
+  return count;
+}
+
+__attribute__ ((used))
+int _read (int fhdl, char *buf, size_t count)
+{
+  (void) fhdl;
+  return count;
+}
+
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+
+__attribute__((weak)) int _isatty(int fd)
+{
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+        return 1;
+ 
+    errno = EBADF;
+    return 0;
+}
+ 
+__attribute__((weak)) int _close(int fd)
+{
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+        return 0;
+ 
+    errno = EBADF;
+    return -1;
+}
+ 
+__attribute__((weak)) int _lseek(int fd, int ptr, int dir)
+{
+    (void)fd;
+    (void)ptr;
+    (void)dir;
+ 
+    errno = EBADF;
+    return -1;
+}
+ 
+__attribute__((weak)) int _fstat(int fd, struct stat *st)
+{
+    if (fd >= STDIN_FILENO && fd <= STDERR_FILENO)
+    {
+        st->st_mode = S_IFCHR;
+        return 0;
+    }
+ 
+    errno = EBADF;
+    return 0;
+}
+
+#endif

@@ -76,8 +76,8 @@
 #define UART_DEFAULT_CONFIG_PARITY         0
 #define UART_DEFAULT_CONFIG_BAUDRATE       UART_BAUDRATE_BAUDRATE_Baud115200
 #define UART_DEFAULT_CONFIG_IRQ_PRIORITY   7
-#define UART_EASY_DMA_SUPPORT              1
-#define UART_LEGACY_SUPPORT                1
+#define UART_EASY_DMA_SUPPORT              0
+#define UART_LEGACY_SUPPORT                0
 #define UART_CONFIG_LOG_ENABLED            0
 
 #define UART0_ENABLED                      0

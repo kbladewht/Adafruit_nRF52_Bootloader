@@ -30,7 +30,7 @@ fi
 
 if [ "$1" = "820" ]; then
   printf "${GREEN}Done generate feather_nrf52820_express start...$END\n"
-  make BOARD=feather_nrf52820_express DEBUG=1 all flash
+  make BOARD=feather_nrf52820_express DEBUG=0 all flash
   printf "${GREEN}Done generate feather_nrf52820_express...$END\n"
   exit 0    
 fi

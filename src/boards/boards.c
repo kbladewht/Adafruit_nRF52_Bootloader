@@ -24,16 +24,10 @@
 
 #include "boards.h"
 
-#ifndef NRF52820_XXAA
-#include "nrf_pwm.h"
-#endif
 
 #include "app_scheduler.h"
 #include "app_timer.h"
 
-#ifdef LED_APA102
-#include "nrf_spim.h"
-#endif
 
 //--------------------------------------------------------------------+
 // MACRO TYPEDEF CONSTANT ENUM DECLARATION
@@ -41,11 +35,7 @@
 #define SCHED_MAX_EVENT_DATA_SIZE           sizeof(app_timer_event_t)        /**< Maximum size of scheduler events. */
 #define SCHED_QUEUE_SIZE                    30                               /**< Maximum number of events in the scheduler queue. */
 
-#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102)
-  void neopixel_init(void);
-  void neopixel_write(uint8_t *pixels);
-  void neopixel_teardown(void);
-#endif
+
 
 //------------- IMPLEMENTATION -------------//
 void button_init(uint32_t pin)

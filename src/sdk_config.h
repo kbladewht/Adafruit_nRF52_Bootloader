@@ -52,10 +52,6 @@
 
 #define HCI_UART_BAUDRATE                  UART_BAUDRATE_BAUDRATE_Baud115200
 #define HCI_UART_FLOW_CONTROL              HWFC
-#define HCI_UART_RX_PIN                    RX_PIN_NUMBER
-#define HCI_UART_TX_PIN                    TX_PIN_NUMBER
-#define HCI_UART_CTS_PIN                   CTS_PIN_NUMBER
-#define HCI_UART_RTS_PIN                   RTS_PIN_NUMBER
 
 #define HCI_TRANSPORT_ENABLED              1
 #define HCI_MAX_PACKET_SIZE_IN_BITS        8000

@@ -22,8 +22,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef _FEATHER_NRF52840_H
-#define _FEATHER_NRF52840_H
+#ifndef _FEATHER_NRF52820_H
+#define _FEATHER_NRF52820_H
 
 #define _PINNUM(port, pin)    ((port)*32 + (pin))
 
@@ -34,10 +34,6 @@
 #define LED_PRIMARY_PIN       _PINNUM(1, 15)
 #define LED_SECONDARY_PIN     _PINNUM(1, 10)
 #define LED_STATE_ON          1
-// #define __SOFTFP__
-// #define LED_NEOPIXEL          _PINNUM(0, 16)
-// #define NEOPIXELS_NUMBER      1
-// #define BOARD_RGB_BRIGHTNESS  0x040404
 
 /*------------------------------------------------------------------*/
 /* BUTTON

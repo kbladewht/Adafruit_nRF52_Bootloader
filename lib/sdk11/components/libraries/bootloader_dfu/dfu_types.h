@@ -65,7 +65,7 @@ static inline bool is_sd_existed(void)
 #elif  defined(NRF52820_XXAA)
   // Flash = 256 KB, allow to be defined in debug mode
   #ifndef BOOTLOADER_REGION_START
-  #define BOOTLOADER_REGION_START             0x00034000                  /**< This field should correspond to start address of the bootloader, found in UICR.RESERVED, 0x10001014, register. This value is used for sanity check, so the bootloader will fail immediately if this value differs from runtime value. The value is used to determine max application size for updating. */
+  #define BOOTLOADER_REGION_START             0x00035800                  /**< This field should correspond to start address of the bootloader, found in UICR.RESERVED, 0x10001014, register. This value is used for sanity check, so the bootloader will fail immediately if this value differs from runtime value. The value is used to determine max application size for updating. */
   #endif
   #define BOOTLOADER_MBR_PARAMS_PAGE_ADDRESS  0x0003E000                  /**< The field specifies the page location of the mbr params page address. */
   #define BOOTLOADER_SETTINGS_ADDRESS         0x0003F000                  /**< The field specifies the page location of the bootloader settings address. */

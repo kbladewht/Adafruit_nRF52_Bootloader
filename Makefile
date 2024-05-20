@@ -125,7 +125,7 @@ else ifeq ($(MCU_SUB_VARIANT),nrf52820)
   SD_NAME = s112
   DFU_DEV_REV = 52820
   CFLAGS += -DNRF52820_XXAA -DS112
-  DFU_APP_DATA_RESERVED=7*4096
+  DFU_APP_DATA_RESERVED=0*4096
 else ifeq ($(MCU_SUB_VARIANT),nrf52840)
   SD_NAME = s140
   DFU_DEV_REV = 52840
@@ -162,10 +162,10 @@ C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/bootloader.c
 C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/bootloader_settings.c
 C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/bootloader_util.c
 C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/dfu_transport_serial.c
-C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/dfu_transport_ble.c
+# C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/dfu_transport_ble.c
 C_SRC += $(SDK11_PATH)/libraries/bootloader_dfu/dfu_single_bank.c
-C_SRC += $(SDK11_PATH)/ble/ble_services/ble_dfu/ble_dfu.c
-C_SRC += $(SDK11_PATH)/ble/ble_services/ble_dis/ble_dis.c
+# C_SRC += $(SDK11_PATH)/ble/ble_services/ble_dfu/ble_dfu.c
+# C_SRC += $(SDK11_PATH)/ble/ble_services/ble_dis/ble_dis.c
 C_SRC += $(SDK11_PATH)/drivers_nrf/pstorage/pstorage_raw.c
 
 # Latest SDK files: peripheral drivers
@@ -182,13 +182,13 @@ C_SRC += $(SDK_PATH)/libraries/util/nrf_assert.c
 # UART or USB Serial
 ifeq ($(MCU_SUB_VARIANT),nrf52)
 
-C_SRC += $(SDK_PATH)/libraries/uart/app_uart.c
-C_SRC += $(SDK_PATH)/drivers_nrf/uart/nrf_drv_uart.c
+# C_SRC += $(SDK_PATH)/libraries/uart/app_uart.c
+# C_SRC += $(SDK_PATH)/drivers_nrf/uart/nrf_drv_uart.c
 C_SRC += $(SDK_PATH)/drivers_nrf/common/nrf_drv_common.c
 
 IPATH += $(SDK11_PATH)/libraries/util
 IPATH += $(SDK_PATH)/drivers_nrf/common
-IPATH += $(SDK_PATH)/drivers_nrf/uart
+# IPATH += $(SDK_PATH)/drivers_nrf/uart
 
 else
 
@@ -331,7 +331,7 @@ _VER = $(subst ., ,$(word 1, $(subst -, ,$(GIT_VERSION))))
 CFLAGS += -DMK_BOOTLOADER_VERSION='($(word 1,$(_VER)) << 16) + ($(word 2,$(_VER)) << 8) + $(word 3,$(_VER))'
 
 # Debug option use RTT for printf
-# ifeq ($(DEBUG), 1)
+ifeq ($(DEBUG), 1)
   CFLAGS += -DCFG_DEBUG -DSEGGER_RTT_MODE_DEFAULT=SEGGER_RTT_MODE_BLOCK_IF_FIFO_FULL
   RTT_SRC = lib/SEGGER_RTT
   IPATH += $(RTT_SRC)/RTT
@@ -346,7 +346,7 @@ CFLAGS += -DMK_BOOTLOADER_VERSION='($(word 1,$(_VER)) << 16) + ($(word 2,$(_VER)
   else
     CFLAGS += -DBOOTLOADER_REGION_START=0x6D000
   endif
-# endif
+endif
 
 CFLAGS += -DDFU_APP_DATA_RESERVED=$(DFU_APP_DATA_RESERVED)
 

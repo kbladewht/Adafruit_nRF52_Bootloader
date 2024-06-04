@@ -56,18 +56,3 @@ jobs:
     - name: Build
       run: |
         make BOARD=feather_nrf52833_express  all
-        make BOARD=feather_nrf52833_express copy-artifact
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.board }}
-        path: _bin/${{ matrix.board }}
-
-    - name: Upload Release Asset
-      uses: softprops/action-gh-release@v1
-      if: ${{ github.event_name == 'release' }}
-      with:
-        files: |
-          _bin/${{ matrix.board }}/${{ matrix.board }}_bootloader-*.zip
-          _bin/${{ matrix.board }}/${{ matrix.board }}_bootloader-*.hex
-          _bin/${{ matrix.board }}/update-${{ matrix.board }}_bootloader-*.uf2

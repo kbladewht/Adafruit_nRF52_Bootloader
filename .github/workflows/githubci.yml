@@ -1,28 +1,3 @@
-Skip to content
-Navigation Menu
-adafruit
-/
-Adafruit_nRF52_Bootloader
-
-Type / to search
-
-Code
-Issues
-23
-Pull requests
-14
-Discussions
-Actions
-Projects
-1
-Security
-Insights
-Build
-Merge pull request #329 from adafruit/ci-auto-matrix #524
-Jobs
-Run details
-Workflow file for this run
-.github/workflows/githubci.yml at 836c8dc
 name: Build
 
 on:
@@ -49,6 +24,7 @@ jobs:
           MATRIX_JSON=$(ls -d */ | sed 's/\/$//' | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=$MATRIX_JSON"
           echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+
   build:
     needs: set-matrix
     runs-on: ubuntu-latest
@@ -76,10 +52,12 @@ jobs:
     - name: Install Tools
       run: |
         pip3 install adafruit-nrfutil uritemplate requests intelhex setuptools
+
     - name: Build
       run: |
         make BOARD=${{ matrix.board }} all
         make BOARD=${{ matrix.board }} copy-artifact
+
     - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.board }}
@@ -93,4 +71,3 @@ jobs:
           _bin/${{ matrix.board }}/${{ matrix.board }}_bootloader-*.zip
           _bin/${{ matrix.board }}/${{ matrix.board }}_bootloader-*.hex
           _bin/${{ matrix.board }}/update-${{ matrix.board }}_bootloader-*.uf2
-Merge pull request #329 from adafruit/ci-auto-matrix · adafruit/Adafruit_nRF52_Bootloader@836c8dc

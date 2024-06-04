@@ -21,7 +21,7 @@ jobs:
         id: set-matrix
         working-directory: src/boards
         run: |
-          names=("feather_nrf52833_express" "feather_nrf52840_express")
+          names=("feather_nrf52833_pivot" "feather_nrf52840_express")
           MATRIX_JSON=$(printf '%s\n' "${names[@]}" | jq -R -s -c 'split("\n")[:-1]')
           echo "matrix=$MATRIX_JSON"
           echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT

@@ -55,8 +55,8 @@ jobs:
 
     - name: Build
       run: |
-        make BOARD=${{ matrix.board }} all
-        make BOARD=${{ matrix.board }} copy-artifact
+        make BOARD=feather_nrf52833_express  all
+        make BOARD=feather_nrf52833_express copy-artifact
 
     - uses: actions/upload-artifact@v4
       with:

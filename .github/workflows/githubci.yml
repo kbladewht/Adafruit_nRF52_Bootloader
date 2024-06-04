@@ -28,6 +28,10 @@ jobs:
   build:  
     needs: set-matrix
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
     - name: Setup Python
       uses: actions/setup-python@v5

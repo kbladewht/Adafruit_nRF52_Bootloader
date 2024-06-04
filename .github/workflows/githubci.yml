@@ -25,7 +25,8 @@ jobs:
           echo "matrix=$MATRIX_JSON"
           echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
 
-  build:
+  build:  
+    needs: set-matrix
     runs-on: ubuntu-latest
     steps:
     - name: Setup Python

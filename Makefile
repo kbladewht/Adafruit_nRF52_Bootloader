@@ -401,7 +401,7 @@ INC_PATHS = $(addprefix -I,$(IPATH))
 .PHONY: all clean flash flash-dfu flash-sd flash-mbr dfu-flash sd mbr gdbflash gdb
 
 # default target to build
-all: $(BUILD)/$(OUT_NAME).out  $(BUILD)/$(MERGED_FILE).hex
+all: $(BUILD)/$(OUT_NAME).out $(BUILD)/$(OUT_NAME)_nosd.hex $(BUILD)/update-$(OUT_NAME)_nosd.uf2 $(BUILD)/$(MERGED_FILE).hex $(BUILD)/$(MERGED_FILE).zip
 
 # Print out the value of a make variable.
 # https://stackoverflow.com/questions/16467718/how-to-print-out-a-variable-in-makefile
@@ -469,6 +469,7 @@ $(BIN):
 	@$(MKDIR) -p $@
 
 copy-artifact: $(BIN)
+	@$(CP) $(BUILD)/$(OUT_NAME)_nosd.hex $(BIN)
 	@$(CP) $(BUILD)/$(MERGED_FILE).hex $(BIN)
 
 #--------------------------------------

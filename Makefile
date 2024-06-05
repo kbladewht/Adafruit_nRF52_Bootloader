@@ -13,6 +13,7 @@
 SDK_PATH     = libpivot/sdk/components
 SDK11_PATH   = lib/sdk11/components
 TUSB_PATH    = lib/tinyusb/src
+TUSB_PATH_PIVOT    = libpivot/tinyusb/src
 NRFX_PATH    = libpivot/nrfx
 SD_PATH      = libpivot/softdevice/$(SD_FILENAME)
 
@@ -204,7 +205,7 @@ C_SRC += \
 
 # TinyUSB stack
 C_SRC += \
-	$(TUSB_PATH)/portable/nordic/nrf5x/dcd_nrf5x.c \
+	$(TUSB_PATH_PIVOT)/portable/nordic/nrf5x/dcd_nrf5x.c \
 	$(TUSB_PATH)/common/tusb_fifo.c \
 	$(TUSB_PATH)/device/usbd.c \
 	$(TUSB_PATH)/device/usbd_control.c \

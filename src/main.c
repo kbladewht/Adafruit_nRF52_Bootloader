@@ -468,19 +468,7 @@ __attribute__((weak)) int _fstat(int fd, struct stat *st)
 
 #else
 
-__attribute__ ((used))
-int _write (int fhdl, const void *buf, size_t count)
-{
-  (void) fhdl;
-  return count;
-}
 
-__attribute__ ((used))
-int _read (int fhdl, char *buf, size_t count)
-{
-  (void) fhdl;
-  return count;
-}
 
 #include <sys/stat.h>
 #include <unistd.h>

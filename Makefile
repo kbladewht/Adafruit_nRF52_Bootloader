@@ -10,11 +10,11 @@
 # local customization
 -include Makefile.user
 
-SDK_PATH     = lib/sdk/components
+SDK_PATH     = libpivot/sdk/components
 SDK11_PATH   = lib/sdk11/components
 TUSB_PATH    = lib/tinyusb/src
-NRFX_PATH    = lib/nrfx
-SD_PATH      = lib/softdevice/$(SD_FILENAME)
+NRFX_PATH    = libpivot/nrfx
+SD_PATH      = libpivot/softdevice/$(SD_FILENAME)
 
 # SD_VERSION can be overwritten by board.mk
 ifndef SD_VERSION

@@ -44,7 +44,6 @@ jobs:
     - name: Install Tools
       run: |
         pip3 install adafruit-nrfutil uritemplate requests intelhex setuptools
-        pip3 install linkermap/
 
     - name: Build
       run: |
@@ -52,10 +51,7 @@ jobs:
         make BOARD=${{ matrix.board }} all
         make BOARD=${{ matrix.board }} copy-artifact
 
-    - name: Linker Map
-      run: make BOARD=${{ matrix.board }} linkermap
-
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.board }}
         path: _bin/${{ matrix.board }}

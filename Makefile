@@ -469,10 +469,10 @@ $(BIN):
 	@$(MKDIR) -p $@
 
 copy-artifact: $(BIN)
-  @$(CP) $(BUILD)/$(OUT_NAME)_nosd.hex $(BIN)
-  @$(CP) $(BUILD)/$(MERGED_FILE).hex $(BIN)
-  @$(CP) $(BUILD)/$(MERGED_FILE).zip $(BIN)
-  @$(CP) $(BUILD)/update-$(OUT_NAME)_nosd.uf2 $(BIN)
+	@$(CP) $(BUILD)/update-$(OUT_NAME)_nosd.uf2 $(BIN)
+	@$(CP) $(BUILD)/$(MERGED_FILE).hex $(BIN)
+	@$(CP) $(BUILD)/$(MERGED_FILE).zip $(BIN)
+	@$(CP) $(BUILD)/$(OUT_NAME)_nosd.hex $(BIN)
   
 
 #--------------------------------------

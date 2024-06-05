@@ -9,32 +9,41 @@ on:
       - created
 
 jobs:
+  set-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set matrix
+        id: set-matrix
+        working-directory: src/boards
+        run: |
+          names=("feather_nrf52833_pivot" "feather_nrf52820_express")
+          MATRIX_JSON=$(printf '%s\n' "${names[@]}" | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix=$MATRIX_JSON"
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+
   build:
+    needs: set-matrix
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        board:
-          # Adafruit Boards
-          - 'feather_nrf52833_express'
-          - 'feather_nrf52820_express'
-          - 'xiao_nrf52840_ble_sense'
-                    
+        board: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
     - name: Setup Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
 
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: true
-
-    - name: Checkout linkermap
-      uses: actions/checkout@v4
-      with:
-         repository: hathach/linkermap
-         path: linkermap
 
     - name: Install ARM GCC
       uses: carlosperate/arm-none-eabi-gcc-action@v1
@@ -47,7 +56,6 @@ jobs:
 
     - name: Build
       run: |
-        arm-none-eabi-gcc --version
         make BOARD=${{ matrix.board }} all
         make BOARD=${{ matrix.board }} copy-artifact
 

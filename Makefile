@@ -469,9 +469,7 @@ $(BIN):
 	@$(MKDIR) -p $@
 
 copy-artifact: $(BIN)
-	@$(CP) $(BUILD)/update-$(OUT_NAME)_nosd.uf2 $(BIN)
 	@$(CP) $(BUILD)/$(MERGED_FILE).hex $(BIN)
-	@$(CP) $(BUILD)/$(MERGED_FILE).zip $(BIN)
 
 #--------------------------------------
 # Flash Target

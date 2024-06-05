@@ -23,7 +23,7 @@ if [ -n "$2" ]; then
 fi
 
 if [ "$1" = "833" ]; then
-  make BOARD=feather_nrf52833_express DEBUG=${qf_debug} all flash
+  make BOARD=feather_nrf52833_pivot DEBUG=${qf_debug} all
   printf "${GREEN}Done generate receiver...$END\n"
   exit 0    
 fi

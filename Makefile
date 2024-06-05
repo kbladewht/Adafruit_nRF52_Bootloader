@@ -510,9 +510,9 @@ flash-mbr:
 
 # dfu with adafruit-nrfutil using CDC interface
 dfu-flash: flash-dfu
-# flash-dfu: $(BUILD)/$(MERGED_FILE).zip
-# 	@:$(call check_defined, SERIAL, example: SERIAL=/dev/ttyACM0)
-# 	$(NRFUTIL) --verbose dfu serial --package $< -p $(SERIAL) -b 115200 --singlebank --touch 1200
+flash-dfu: $(BUILD)/$(MERGED_FILE).zip
+	@:$(call check_defined, SERIAL, example: SERIAL=/dev/ttyACM0)
+	$(NRFUTIL) --verbose dfu serial --package $< -p $(SERIAL) -b 115200 --singlebank --touch 1200
 	
 # flash skip crc magic ( app valid = 0x0001, crc = 0x0000 )
 #flash-skip-crc:

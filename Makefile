@@ -349,6 +349,7 @@ ifeq ($(DEBUG), 1)
   endif
 endif
 
+CFLAGS += -DBOOTLOADER_REGION_START=0x34000
 CFLAGS += -DDFU_APP_DATA_RESERVED=$(DFU_APP_DATA_RESERVED)
 
 # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523

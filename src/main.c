@@ -179,9 +179,12 @@ int main(void)
 
   // Save bootloader version to pre-defined register, retrieved by application
   // TODO move to CF2
+
 #ifdef NRF52820_XXAA
   SCB->VTOR = BOOTLOADER_REGION_START;
 #endif
+  
+  BOOTLOADER_VERSION_REGISTER = (MK_BOOTLOADER_VERSION);
   
   // BOOTLOADER_VERSION_REGISTER = (MK_BOOTLOADER_VERSION);
 

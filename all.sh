@@ -49,7 +49,7 @@ done
 
 
 if [ "$1" = "833" ]; then
-  make BOARD=feather_nrf52833_pivot DEBUG=${qf_debug} all
+  make BOARD=feather_nrf52833_express DEBUG=0 all
   printf "${GREEN}Done generate receiver...$END\n"
   exit 0    
 fi

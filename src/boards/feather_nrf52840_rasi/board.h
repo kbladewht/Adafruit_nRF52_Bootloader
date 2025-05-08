@@ -52,7 +52,7 @@
 // BLE OTA
 //--------------------------------------------------------------------+
 #define BLEDIS_MANUFACTURER   "Rasi Industries"
-#define BLEDIS_MODEL          "Rasi nRF52840 Express"
+#define BLEDIS_MODEL          "Rasi40 Express"
 
 //--------------------------------------------------------------------+
 // USB
@@ -63,9 +63,9 @@
 
 //------------- UF2 -------------//
 //------------- UF2 -------------//
-#define UF2_PRODUCT_NAME      "Rasi_NRF_840BL"
+#define UF2_PRODUCT_NAME      "Rasi_NRF_40BL"
 #define UF2_VOLUME_LABEL      "Rasi840BOOT"
-#define UF2_BOARD_ID          "nRF52833-Feather-revD"
+#define UF2_BOARD_ID          "PIVOT40-Feather-revD"
 #define UF2_INDEX_URL         "https://www.adafruit.com/product/4062" // TODO change later
 
 

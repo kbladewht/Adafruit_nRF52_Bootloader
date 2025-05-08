@@ -50,8 +50,8 @@
 //--------------------------------------------------------------------+
 // BLE OTA
 //--------------------------------------------------------------------+
-#define BLEDIS_MANUFACTURER   "Adafruit Industries"
-#define BLEDIS_MODEL          "Feather nRF52833 Express"
+#define BLEDIS_MANUFACTURER   "PIVOT Industries"
+#define BLEDIS_MODEL          "Feather PIVOT33 Express"
 
 //--------------------------------------------------------------------+
 // USB
@@ -61,9 +61,9 @@
 #define USB_DESC_CDC_ONLY_PID  0x002A // TODO change later
 
 //------------- UF2 -------------//
-#define UF2_PRODUCT_NAME      "Adafruit Feather nRF52833 Express"
-#define UF2_VOLUME_LABEL      "FTHR833BOOT"
-#define UF2_BOARD_ID          "nRF52833-Feather-revD"
+#define UF2_PRODUCT_NAME      "PIVOT_BL"
+#define UF2_VOLUME_LABEL      "FTHV29BOOT"
+#define UF2_BOARD_ID          "PIVOT-Feather-revD"
 #define UF2_INDEX_URL         "https://www.adafruit.com/product/4062" // TODO change later
 
 #endif

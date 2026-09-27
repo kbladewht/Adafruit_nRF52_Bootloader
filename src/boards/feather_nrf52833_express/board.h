@@ -51,7 +51,7 @@
 // BLE OTA
 //--------------------------------------------------------------------+
 #define BLEDIS_MANUFACTURER   "PIVOT Industries"
-#define BLEDIS_MODEL          "Feather PIVOT33 Express"
+#define BLEDIS_MODEL          "Nordic33 Bootloader"
 
 //--------------------------------------------------------------------+
 // USB
@@ -61,8 +61,9 @@
 #define USB_DESC_CDC_ONLY_PID  0x002A // TODO change later
 
 //------------- UF2 -------------//
-#define UF2_PRODUCT_NAME      "PIVOT_BL"
-#define UF2_VOLUME_LABEL      "FTHV29BOOT"
+#define UF2_PRODUCT_NAME      "Nordic33 Bootloader"
+// #define UF2_VOLUME_LABEL      "FTHV29BOOT"
+#define UF2_VOLUME_LABEL      "Nordic33 BL"
 #define UF2_BOARD_ID          "PIVOT-Feather-revD"
 #define UF2_INDEX_URL         "https://www.adafruit.com/product/4062" // TODO change later
 

@@ -119,10 +119,10 @@ static void wait_for_events(void)
 
     // Feed all Watchdog just in case application enable it
     // WDT cannot be disabled once started. It even last through NVIC soft reset
-    if ( nrf_wdt_started(NRF_WDT) )
-    {
-      for (uint8_t i=0; i<8; i++) nrf_wdt_reload_request_set(NRF_WDT, i);
-    }
+    // if ( nrf_wdt_started(NRF_WDT) )
+    // {
+    //   for (uint8_t i=0; i<8; i++) nrf_wdt_reload_request_set(NRF_WDT, i);
+    // }
 
     // Event received. Process it from the scheduler.
     app_sched_execute();
@@ -346,7 +346,7 @@ uint32_t bootloader_dfu_start(bool ota, uint32_t timeout_ms, bool cancel_timeout
       dfu_startup_packet_received = false;
 
       app_timer_create(&_dfu_startup_timer, APP_TIMER_MODE_SINGLE_SHOT, dfu_startup_timer_handler);
-      app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(30000), NULL);
+      app_timer_start(_dfu_startup_timer, APP_TIMER_TICKS(300000), NULL);
     }
 
     err_code = dfu_transport_serial_update_start();

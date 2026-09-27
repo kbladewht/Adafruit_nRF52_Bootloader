@@ -1,3 +1,7 @@
+export PATH="/c/Users/dellht/AppData/Local/Programs/Python/Python314/Scripts:$PATH"
+export PATH="/c/Users/dellht/AppData/Local/Programs/Python/Python314:$PATH"
+# export PATH="/ucrt64/bin:$PATH"
+
 keyboard_name=qfly
 currentdate=$(date +%Y%m%d-%H)
 receiver_uf2="./receiver-${currentdate}.uf2"
@@ -49,7 +53,7 @@ done
 
 
 if [ "$1" = "833" ]; then
-  make BOARD=feather_nrf52833_express DEBUG=0 all
+  make BOARD=feather_nrf52833_express DEBUG=0
   printf "${GREEN}Done generate receiver...$END\n"
   exit 0    
 fi

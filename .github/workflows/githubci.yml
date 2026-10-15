@@ -1,12 +1,17 @@
 name: Build
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
-  repository_dispatch:
+    branches: [ master ]
   release:
     types:
       - created
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   set-matrix:
@@ -34,11 +39,6 @@ jobs:
       matrix:
         board: ${{ fromJSON(needs.set-matrix.outputs.matrix) }}
     steps:
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-
     - name: Checkout Code
       uses: actions/checkout@v4
       with:

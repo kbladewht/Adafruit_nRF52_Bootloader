@@ -27,14 +27,14 @@
 #include "app_scheduler.h"
 #include "app_timer.h"
 
-#ifdef LED_APA102
+#ifdef LED_APA102_CLK
 #include "nrf_spim.h"
 #endif
 
 #define SCHED_MAX_EVENT_DATA_SIZE           sizeof(app_timer_event_t)        /**< Maximum size of scheduler events. */
 #define SCHED_QUEUE_SIZE                    30                               /**< Maximum number of events in the scheduler queue. */
 
-#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102)
+#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102_CLK)
 void neopixel_init(void);
 void neopixel_write(uint8_t* pixels);
 void neopixel_teardown(void);
@@ -50,6 +50,7 @@ void SysTick_Handler(void) {
   led_tick();
 }
 
+#if defined(BUTTON_DFU) || defined(BUTTON_DFU_OTA)
 void button_init(uint32_t pin) {
   if (BUTTON_PULL == NRF_GPIO_PIN_PULLDOWN) {
     nrf_gpio_cfg_sense_input(pin, BUTTON_PULL, NRF_GPIO_PIN_SENSE_HIGH);
@@ -62,6 +63,7 @@ bool button_pressed(uint32_t pin) {
   uint32_t const active_state = (BUTTON_PULL == NRF_GPIO_PIN_PULLDOWN ? 1 : 0);
   return nrf_gpio_pin_read(pin) == active_state;
 }
+#endif
 
 // This is declared so that a board specific init can be called from here.
 void __attribute__((weak)) board_init2(void) {}
@@ -74,8 +76,12 @@ void board_init(void) {
   NRF_CLOCK->LFCLKSRC = CLOCK_LFCLKSRC_SRC_RC;
   NRF_CLOCK->TASKS_LFCLKSTART = 1UL;
 
+#ifdef BUTTON_DFU
   button_init(BUTTON_DFU);
-  button_init(BUTTON_FRESET);
+#endif
+#ifdef BUTTON_DFU_OTA
+  button_init(BUTTON_DFU_OTA);
+#endif
   NRFX_DELAY_US(100); // wait for the pin state is stable
 
 #if LEDS_NUMBER > 0
@@ -86,7 +92,7 @@ void board_init(void) {
   #endif
 #endif
 
-#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102)
+#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102_CLK)
   // use neopixel for use enumeration
   #ifdef NEOPIXEL_POWER_PIN
   nrf_gpio_cfg_output(NEOPIXEL_POWER_PIN);
@@ -111,7 +117,13 @@ void board_init(void) {
   //     #define UICR_REGOUT0_VALUE UICR_REGOUT0_VOUT_3V3
   // in board.h when using that power configuration.
 #ifdef UICR_REGOUT0_VALUE
-  if ((NRF_UICR->REGOUT0 & UICR_REGOUT0_VOUT_Msk) != (UICR_REGOUT0_VALUE << UICR_REGOUT0_VOUT_Pos)){
+  // for some reason bellow condition is true even though debugger show 3.0V
+  // pyocd> rw 0x10001304
+  // 10001304:  fffffffc
+  // it leads to infinite boot loop. Let wait for NVM to be ready first.
+  NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
+  while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
+  if ((NRF_UICR->REGOUT0 & UICR_REGOUT0_VOUT_Msk) == (UICR_REGOUT0_VOUT_DEFAULT << UICR_REGOUT0_VOUT_Pos)){
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Wen << NVMC_CONFIG_WEN_Pos;
     while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
     NRF_UICR->REGOUT0 = (NRF_UICR->REGOUT0 & ~((uint32_t)UICR_REGOUT0_VOUT_Msk)) |
@@ -119,8 +131,10 @@ void board_init(void) {
 
     NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Ren << NVMC_CONFIG_WEN_Pos;
     while (NRF_NVMC->READY == NVMC_READY_READY_Busy){}
-
-    NVIC_SystemReset();
+    // to avoid infinity boot loop reset only if REGOUT0 was set correctly
+    if((NRF_UICR->REGOUT0 & UICR_REGOUT0_VOUT_Msk) == (UICR_REGOUT0_VALUE << UICR_REGOUT0_VOUT_Pos)){
+      NVIC_SystemReset();
+    }
   }
 #endif
 
@@ -147,7 +161,7 @@ void board_teardown(void) {
   led_pwm_teardown();
 #endif
 
-#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102)
+#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102_CLK)
   neopixel_teardown();
 #endif
 
@@ -362,7 +376,7 @@ static uint32_t primary_cycle_length;
 static uint32_t secondary_cycle_length;
 #endif
 
-void led_tick() {
+void led_tick(void) {
   uint32_t millis = _systick_count;
 
   uint32_t cycle = millis % primary_cycle_length;
@@ -452,7 +466,7 @@ void led_state(uint32_t state) {
     final_color = (uint8_t*) &rgb_color;
   }
 
-#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102)
+#if defined(LED_NEOPIXEL) || defined(LED_RGB_RED_PIN) || defined(LED_APA102_CLK)
   if (final_color != NULL) {
     neopixel_write(final_color);
   }
@@ -560,7 +574,7 @@ void neopixel_write(uint8_t* pixels) {
 
 #endif
 
-#ifdef LED_APA102
+#ifdef LED_APA102_CLK
 #define BYTE_PER_PIXEL  4
 
 // 4 zero bytes are required to initiate update

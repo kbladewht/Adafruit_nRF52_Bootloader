@@ -50,6 +50,10 @@ void SysTick_Handler(void) {
   led_tick();
 }
 
+uint32_t board_millis(void) {
+  return _systick_count;
+}
+
 #if defined(BUTTON_DFU) || defined(BUTTON_DFU_OTA)
 void button_init(uint32_t pin) {
   if (BUTTON_PULL == NRF_GPIO_PIN_PULLDOWN) {

@@ -42,6 +42,7 @@
 #include "nrf_clock.h"
 #include "nrfx_power.h"
 #include "nrfx_pwm.h"
+#include "nrfx_nvmc.h"
 
 #include "sdk_common.h"
 #include "bootloader.h"
@@ -116,6 +117,55 @@ extern void tusb_hal_nrf_power_event(uint32_t event);
 
 #define BOOTLOADER_VERSION_REGISTER     NRF_TIMER2->CC[0]
 #define DFU_SERIAL_STARTUP_INTERVAL     1000
+
+//--------------------------------------------------------------------+
+// Power cycle DFU
+//
+// Enter DFU after DFU_POWER_CYCLE_COUNT consecutive short power cycles, i.e.
+// after power was removed again within DFU_POWER_CYCLE_WINDOW_MS of plugging
+// in, that many times in a row. Useful for dongles without a DFU button:
+// unplug/replug quickly N times, the next plug-in lands in DFU.
+//
+// Double reset detection cannot be used for this since it relies on RAM
+// surviving a GPIO reset, while a real power cycle clears it. The counter is
+// kept in flash instead, which means the bootloader has to stay resident for
+// the whole window: the application start is delayed by
+// DFU_POWER_CYCLE_WINDOW_MS.
+//
+// Power loss is not sensed, it is inferred: every power-on appends the next
+// stage to a journal and the stage is only cleared again once the whole window
+// elapsed. A power cycle that is cut short simply never reaches the clear, so
+// the next power-on still sees a non-zero stage. Works for any kind of power
+// loss, no VBUS detection needed.
+//
+// Flash bits can only be cleared (1 -> 0), so every append goes to a fresh
+// word of the journal:
+//   0xFFFFFFFF (free) -> stage (1 .. COUNT) -> 0 (cleared)
+// The journal lives in the unused tail of the bootloader settings page and is
+// only erased (with the settings restored) once it is full.
+//
+// Set DFU_POWER_CYCLE_WINDOW_MS to 0 to disable.
+//--------------------------------------------------------------------+
+#ifndef DFU_POWER_CYCLE_WINDOW_MS
+#define DFU_POWER_CYCLE_WINDOW_MS       0
+#endif
+
+// number of consecutive short power cycles needed to enter DFU
+#ifndef DFU_POWER_CYCLE_COUNT
+#define DFU_POWER_CYCLE_COUNT           2
+#endif
+
+#if (DFU_POWER_CYCLE_WINDOW_MS > 0)
+#define DFU_POWER_CYCLE_EN              1
+#else
+#define DFU_POWER_CYCLE_EN              0
+#endif
+
+// journal lives in the unused tail of the settings page, the first 256 bytes
+// of that page hold the bootloader settings
+#define DFU_POWER_CYCLE_LOG_START       (BOOTLOADER_SETTINGS_ADDRESS + 0x100)
+#define DFU_POWER_CYCLE_LOG_WORDS       ((CODE_PAGE_SIZE - 0x100) / 4)
+#define DFU_POWER_CYCLE_LOG_HEAD_WORDS  ((DFU_POWER_CYCLE_LOG_START - BOOTLOADER_SETTINGS_ADDRESS) / 4)
 
 // Allow for using reset button essentially to swap between application and bootloader.
 // This is controlled by a flag in the app and is the behavior of CPX and all Arcade boards when using MakeCode.
@@ -238,6 +288,68 @@ int main(void) {
   NVIC_SystemReset();
 }
 
+#if DFU_POWER_CYCLE_EN
+
+static uint32_t* const power_cycle_log = (uint32_t*) DFU_POWER_CYCLE_LOG_START;
+
+// index of the first still unused word, DFU_POWER_CYCLE_LOG_WORDS if the log is full
+static uint32_t power_cycle_first_free(void) {
+  for (uint32_t i = 0; i < DFU_POWER_CYCLE_LOG_WORDS; i++) {
+    if (power_cycle_log[i] == EMPTY_FLASH_MASK) return i;
+  }
+  return DFU_POWER_CYCLE_LOG_WORDS;
+}
+
+// Erase the log. Bootloader settings at the start of the page are preserved.
+static void power_cycle_log_rewind(void) {
+  uint32_t const page_addr = BOOTLOADER_SETTINGS_ADDRESS;
+  uint32_t head[DFU_POWER_CYCLE_LOG_HEAD_WORDS];
+
+  memcpy(head, (void const*) page_addr, sizeof(head));
+
+  nrfx_nvmc_page_erase(page_addr);
+  nrfx_nvmc_words_write(page_addr, head, DFU_POWER_CYCLE_LOG_HEAD_WORDS);
+}
+
+// Stage left behind by the previous power-on. Non-zero means it was cut short.
+static uint32_t power_cycle_journal_last(void) {
+  uint32_t const i = power_cycle_first_free();
+  return (i == 0) ? 0 : power_cycle_log[i - 1];
+}
+
+// Append a stage. Whatever is appended here stays visible to the next power-on
+// until power_cycle_journal_clear() runs.
+static void power_cycle_journal_append(uint32_t stage) {
+  uint32_t i = power_cycle_first_free();
+
+  if (i == DFU_POWER_CYCLE_LOG_WORDS) {
+    power_cycle_log_rewind();
+    i = 0;
+  }
+
+  nrfx_nvmc_word_write((uint32_t) &power_cycle_log[i], stage);
+}
+
+#define power_cycle_journal_clear()     power_cycle_journal_append(0)
+
+// RESETREAS is cleared by hardware on a real power-on (VDD from 0) and is
+// retained across pin/watchdog/software resets, so only 0 means "was unplugged".
+static bool is_power_on_reset(void) {
+  return NRF_POWER->RESETREAS == 0;
+}
+
+// Stay resident for the window. Power removed before it expires simply never
+// reaches the clear, which is how a short power cycle is detected.
+static void power_cycle_wait_window(void) {
+  uint32_t const start = board_millis();
+
+  while (board_millis() - start < (uint32_t) DFU_POWER_CYCLE_WINDOW_MS) {
+    __WFE();
+  }
+}
+
+#endif
+
 static void check_dfu_mode(void) {
   uint32_t const gpregret = NRF_POWER->GPREGRET;
 
@@ -257,6 +369,17 @@ static void check_dfu_mode(void) {
   // start either serial, uf2 or ble
   bool dfu_start = _ota_dfu || serial_only_dfu || uf2_dfu ||
                    (((*dbl_reset_mem) == DFU_DBL_RESET_MAGIC) && reason_reset_pin);
+
+#if DFU_POWER_CYCLE_EN
+  // Enough consecutive short power cycles --> enter DFU and start over.
+  // Only a real power-on counts, pin/watchdog/software restarts do not.
+  if (!dfu_start && !dfu_skip && is_power_on_reset() &&
+      power_cycle_journal_last() >= (uint32_t) DFU_POWER_CYCLE_COUNT)
+  {
+    power_cycle_journal_clear();
+    dfu_start = 1;
+  }
+#endif
 
   // Clear GPREGRET if it is our values
   if (dfu_start || dfu_skip) {
@@ -311,6 +434,17 @@ static void check_dfu_mode(void) {
 
       // if RST is pressed during this delay (double reset)--> if will enter dfu
       NRFX_DELAY_MS(DFU_DBL_RESET_DELAY);
+    }
+#endif
+
+#if DFU_POWER_CYCLE_EN
+    // Record this power-on, then stay resident for the window and clear it
+    // again. If power is removed before the window expires the clear never
+    // happens and the next power-on sees the stage as a short power cycle.
+    if (is_power_on_reset()) {
+      power_cycle_journal_append(power_cycle_journal_last() + 1);
+      power_cycle_wait_window();
+      power_cycle_journal_clear();
     }
 #endif
   }

@@ -11,6 +11,10 @@
 # - DUALBANK_FW        : If bootloader will implement a dual bank feature to allow autorecover from failed
 # - FORCE_UF2          : if SIGNED_FW is 1, will force to include UF2 support (UNSECURE, UF2 does NOT validate signature!)
 # - DEFAULT_TO_OTA_DFU : if entering DFU, by default enter OTA DFU instead of Serial DFU
+# - DFU_POWER_CYCLE_WINDOW_MS : enter DFU after DFU_POWER_CYCLE_COUNT consecutive short power
+#                              cycles, short = power removed again within this many ms of
+#                              power-on, 0 = disabled (application start is delayed by this)
+# - DFU_POWER_CYCLE_COUNT     : consecutive short power cycles needed to enter DFU (default 2)
 #------------------------------------------------------------------------------
 
 PYTHON = python
@@ -374,6 +378,11 @@ endif
 
 ifeq ($(DEFAULT_TO_OTA_DFU), 1)
 CFLAGS += -DDEFAULT_TO_OTA_DFU
+endif
+
+ifneq ($(DFU_POWER_CYCLE_WINDOW_MS),)
+CFLAGS += -DDFU_POWER_CYCLE_WINDOW_MS=$(DFU_POWER_CYCLE_WINDOW_MS)
+CFLAGS += -DDFU_POWER_CYCLE_COUNT=$(if $(DFU_POWER_CYCLE_COUNT),$(DFU_POWER_CYCLE_COUNT),2)
 endif
 
 # Extract semantic version numbers (MAJOR.MINOR.PATCH) from GIT_VERSION.

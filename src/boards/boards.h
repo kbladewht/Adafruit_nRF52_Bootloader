@@ -71,6 +71,10 @@
 void board_init(void);
 void board_teardown(void);
 
+// Milliseconds since board_init(), driven by SysTick. Only valid between
+// board_init() and board_teardown().
+uint32_t board_millis(void);
+
 //--------------------------------------------------------------------+
 // LED
 //--------------------------------------------------------------------+

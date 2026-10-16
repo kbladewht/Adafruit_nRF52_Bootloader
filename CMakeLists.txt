@@ -34,6 +34,8 @@ option(DUALBANK_FW "Enable dual bank DFU support" OFF)
 option(FORCE_UF2 "Force UF2 support even with SIGNED_FW" OFF)
 set(SIGNED_FW_QX "" CACHE STRING "Public key Qx (comma-separated bytes)")
 set(SIGNED_FW_QY "" CACHE STRING "Public key Qy (comma-separated bytes)")
+set(DFU_POWER_CYCLE_WINDOW_MS "0" CACHE STRING "Enter DFU after this many consecutive short power cycles, a power cycle is short when power is removed again within this many ms of power-on (0 = disabled)")
+set(DFU_POWER_CYCLE_COUNT "2" CACHE STRING "Number of consecutive short power cycles required to enter DFU")
 
 set(UF2CONV_PY ${CMAKE_CURRENT_LIST_DIR}/lib/uf2/utils/uf2conv.py)
 set(UF2_FAMILY_ID_BOOTLOADER 0xd663823c)
@@ -201,6 +203,13 @@ if (DEFAULT_TO_OTA_DFU)
   target_compile_definitions(bootloader PUBLIC DEFAULT_TO_OTA_DFU)
 endif ()
 
+if (DFU_POWER_CYCLE_WINDOW_MS)
+  target_compile_definitions(bootloader PUBLIC
+    DFU_POWER_CYCLE_WINDOW_MS=${DFU_POWER_CYCLE_WINDOW_MS}
+    DFU_POWER_CYCLE_COUNT=${DFU_POWER_CYCLE_COUNT}
+    )
+endif ()
+
 if (TRACE_ETM STREQUAL "1")
   # ENABLE_TRACE will cause system_nrf5x.c to set up ETM trace
   target_compile_definitions(bootloader PUBLIC ENABLE_TRACE)
@@ -346,6 +355,15 @@ add_custom_command(TARGET bootloader POST_BUILD
   COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:bootloader> $<TARGET_FILE_DIR:bootloader>/bootloader.bin
   COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:bootloader> $<TARGET_FILE_DIR:bootloader>/bootloader.hex
   COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tools/hexmerge.py --overlap=replace -o $<TARGET_FILE_DIR:bootloader>/bootloader_mbr.hex $<TARGET_FILE_DIR:bootloader>/bootloader.hex ${MBR_HEX}
+  
+   # bootloader + MBR + SD → bootloader_mbr_sd.hex
+  COMMAND ${Python_EXECUTABLE}
+    ${CMAKE_CURRENT_LIST_DIR}/tools/hexmerge.py
+    --overlap=replace
+    -o $<TARGET_FILE_DIR:bootloader>/bootloader_mbr_sd.hex
+    $<TARGET_FILE_DIR:bootloader>/bootloader_mbr.hex
+    ${SD_HEX}
+
   COMMAND ${Python_EXECUTABLE} ${UF2CONV_PY} -f ${UF2_FAMILY_ID_BOOTLOADER} -c -o $<TARGET_FILE_DIR:bootloader>/bootloader_mbr.uf2 $<TARGET_FILE_DIR:bootloader>/bootloader_mbr.hex
   VERBATIM)
 

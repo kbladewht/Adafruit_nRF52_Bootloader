@@ -21,7 +21,7 @@ OUT_DIR="$ROOT/build"
 
   # 第1步：配置
   # 连续 2 次短上电（5 秒内又断电）后，第 3 次插上直接进 DFU
-  cmake .. -DBOARD=feather_nrf52833_express -DDFU_POWER_CYCLE_WINDOW_MS=5000 -DDFU_POWER_CYCLE_COUNT=2
+  cmake .. -DBOARD=feather_nrf52833_express -DDFU_POWER_CYCLE_WINDOW_MS=2000 -DDFU_POWER_CYCLE_COUNT=2
 
   # 第2步：编译 bootloader
   cmake --build . --target bootloader

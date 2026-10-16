@@ -338,16 +338,6 @@ static bool is_power_on_reset(void) {
   return NRF_POWER->RESETREAS == 0;
 }
 
-// Stay resident for the window. Power removed before it expires simply never
-// reaches the clear, which is how a short power cycle is detected.
-static void power_cycle_wait_window(void) {
-  uint32_t const start = board_millis();
-
-  while (board_millis() - start < (uint32_t) DFU_POWER_CYCLE_WINDOW_MS) {
-    __WFE();
-  }
-}
-
 #endif
 
 static void check_dfu_mode(void) {
@@ -443,7 +433,12 @@ static void check_dfu_mode(void) {
     // happens and the next power-on sees the stage as a short power cycle.
     if (is_power_on_reset()) {
       power_cycle_journal_append(power_cycle_journal_last() + 1);
-      power_cycle_wait_window();
+
+      // Busy wait on purpose, same as the double reset delay above: sleeping
+      // gates the CPU clock and with it SysTick, so there would be nothing
+      // left to wake us up from.
+      NRFX_DELAY_MS(DFU_POWER_CYCLE_WINDOW_MS);
+
       power_cycle_journal_clear();
     }
 #endif
